@@ -72,9 +72,10 @@
                         <button class="btn-write">글쓰기</button>
                     </div>
 
-                    <div class="posts-list">
+                    <div class="posts-list" id="postsList">
+                        <!-- 게시글이 여기에 동적으로 추가됩니다 -->
                         <!-- 게시글 카드 1 -->
-                        <article class="post-card">
+                        <article class="post-card" style="display: none;">
                             <div class="post-header">
                                 <span class="post-category">자유게시판</span>
                                 <span class="post-date">2024.01.15</span>
@@ -265,5 +266,191 @@
             <p>&copy; 2024 커뮤니티. All rights reserved.</p>
         </div>
     </footer>
+
+    <script>
+        // API 기본 URL
+        const API_BASE_URL = 'https://jsonplaceholder.typicode.com';
+
+        // DOM 요소 가져오기
+        const postsList = document.getElementById('postsList');
+        const btnWrite = document.querySelector('.btn-write');
+        const categoryLinks = document.querySelectorAll('.category-link');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        // ========== 이벤트 리스너 ==========
+
+        // 페이지 로드 시 게시글 목록 가져오기
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPosts();
+        });
+
+        // 글쓰기 버튼 클릭 이벤트
+        btnWrite.addEventListener('click', function() {
+            alert('글쓰기 기능은 게시판 페이지에서 이용하실 수 있습니다.');
+        });
+
+        // 카테고리 링크 클릭 이벤트
+        categoryLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                // 활성 상태 변경
+                categoryLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+                
+                // 카테고리별 게시글 필터링 (예시)
+                const category = this.textContent.trim();
+                loadPosts(category);
+            });
+        });
+
+        // 네비게이션 링크 클릭 이벤트
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                // 활성 상태 변경
+                navLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+                
+                const navText = this.textContent.trim();
+                if (navText === '게시판') {
+                    // 게시판 페이지로 이동하거나 게시글 새로고침
+                    loadPosts();
+                } else if (navText === '인기글') {
+                    loadPopularPosts();
+                }
+            });
+        });
+
+        // ========== Fetch 함수들 ==========
+
+        // 게시글 목록 가져오기
+        async function loadPosts(category = null) {
+            try {
+                postsList.innerHTML = '<div class="loading" style="text-align: center; padding: 2rem; color: #666;">게시글을 불러오는 중...</div>';
+                
+                const response = await fetch(`${API_BASE_URL}/posts`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const posts = await response.json();
+                
+                // 최근 6개만 표시
+                const recentPosts = posts.slice(0, 6);
+                displayPosts(recentPosts);
+                
+            } catch (error) {
+                postsList.innerHTML = `<div class="error" style="background-color: #ffebee; color: #c62828; padding: 1rem; border-radius: 4px; margin: 1rem 0;">게시글을 불러오는 중 오류가 발생했습니다: ${error.message}</div>`;
+            }
+        }
+
+        // 게시글 목록 표시
+        function displayPosts(posts) {
+            if (posts.length === 0) {
+                postsList.innerHTML = '<div class="empty-state" style="text-align: center; padding: 3rem; color: #666;"><p>게시글이 없습니다.</p></div>';
+                return;
+            }
+
+            postsList.innerHTML = posts.map((post, index) => {
+                const categories = ['자유게시판', '질문답변', '정보공유', '후기', '모임', '자유게시판'];
+                const authors = ['개발자123', '초보개발자', '도구마스터', '성공한개발자', '모임장', '로드맵제작자'];
+                const dates = ['2024.01.15', '2024.01.14', '2024.01.13', '2024.01.12', '2024.01.11', '2024.01.10'];
+                
+                // 본문을 100자로 제한
+                const contentPreview = post.body.length > 100 
+                    ? post.body.substring(0, 100) + '...' 
+                    : post.body;
+
+                return `
+                    <article class="post-card" data-post-id="${post.id}">
+                        <div class="post-header">
+                            <span class="post-category">${categories[index] || '자유게시판'}</span>
+                            <span class="post-date">${dates[index] || '2024.01.15'}</span>
+                        </div>
+                        <h3 class="post-title">${post.title}</h3>
+                        <p class="post-content">${contentPreview}</p>
+                        <div class="post-footer">
+                            <div class="post-author">
+                                <span class="author-name">${authors[index] || '사용자'}</span>
+                            </div>
+                            <div class="post-stats">
+                                <span class="stat">👁 ${Math.floor(Math.random() * 500) + 50}</span>
+                                <span class="stat">💬 ${Math.floor(Math.random() * 30) + 5}</span>
+                                <span class="stat">❤️ ${Math.floor(Math.random() * 50) + 10}</span>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+
+            // 게시글 카드 클릭 이벤트 추가
+            document.querySelectorAll('.post-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const postId = this.getAttribute('data-post-id');
+                    viewPostDetail(postId);
+                });
+            });
+        }
+
+        // 인기 게시글 가져오기
+        async function loadPopularPosts() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/posts`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const posts = await response.json();
+                
+                // 조회수 기준으로 정렬 (실제로는 서버에서 처리)
+                const popularPosts = posts.slice(0, 5);
+                displayPosts(popularPosts);
+                
+            } catch (error) {
+                console.error('인기 게시글을 불러오는 중 오류:', error);
+            }
+        }
+
+        // 게시글 상세보기 (새 페이지로 이동하거나 모달 표시)
+        function viewPostDetail(postId) {
+            // 게시판 페이지로 이동하거나 상세 페이지 열기
+            alert(`게시글 ID ${postId} 상세보기\n(실제 구현 시 게시판 페이지로 이동하거나 모달을 표시합니다)`);
+        }
+
+        // 인기 게시글 목록 업데이트 (오른쪽 사이드바)
+        async function updatePopularPosts() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/posts`);
+                if (!response.ok) return;
+                
+                const posts = await response.json();
+                const popularList = document.querySelector('.popular-list');
+                
+                if (popularList) {
+                    popularList.innerHTML = posts.slice(0, 5).map((post, index) => `
+                        <li class="popular-item" data-post-id="${post.id}">
+                            <span class="popular-rank">${index + 1}</span>
+                            <span class="popular-title">${post.title.length > 40 ? post.title.substring(0, 40) + '...' : post.title}</span>
+                        </li>
+                    `).join('');
+
+                    // 인기 게시글 클릭 이벤트
+                    document.querySelectorAll('.popular-item').forEach(item => {
+                        item.addEventListener('click', function() {
+                            const postId = this.getAttribute('data-post-id');
+                            viewPostDetail(postId);
+                        });
+                    });
+                }
+            } catch (error) {
+                console.error('인기 게시글 업데이트 중 오류:', error);
+            }
+        }
+
+        // 페이지 로드 시 인기 게시글도 업데이트
+        document.addEventListener('DOMContentLoaded', function() {
+            updatePopularPosts();
+        });
+    </script>
 </body>
 </html>
