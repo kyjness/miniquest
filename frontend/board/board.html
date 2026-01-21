@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="kr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="board.css">
+    <title>게시판 - DOM & Event & Fetch 예제</title>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="header-container">
+            <h1 class="logo">게시판</h1>
+            <nav class="nav">
+                <button class="nav-btn" id="homeBtn">홈</button>
+                <button class="nav-btn" id="writeBtn">글쓰기</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main">
+        <div class="container">
+            <!-- 게시글 목록 영역 -->
+            <section class="posts-section">
+                <h2>게시글 목록</h2>
+                <div id="postsList" class="posts-list">
+                    <!-- 게시글이 여기에 동적으로 추가됩니다 -->
+                </div>
+            </section>
+
+            <!-- 게시글 상세 영역 (처음에는 숨김) -->
+            <section class="post-detail-section" id="postDetailSection" style="display: none;">
+                <button class="back-btn" id="backToListBtn">← 목록으로</button>
+                <article class="post-detail" id="postDetail">
+                    <!-- 게시글 상세 내용이 여기에 표시됩니다 -->
+                </article>
+                
+                <!-- 댓글 영역 -->
+                <div class="comments-section">
+                    <h3>댓글</h3>
+                    <div class="comment-form">
+                        <input type="text" id="commentName" placeholder="이름" class="comment-input">
+                        <input type="email" id="commentEmail" placeholder="이메일" class="comment-input">
+                        <textarea id="commentBody" placeholder="댓글을 입력하세요" class="comment-textarea"></textarea>
+                        <button class="btn-primary" id="submitCommentBtn">댓글 작성</button>
+                    </div>
+                    <div id="commentsList" class="comments-list">
+                        <!-- 댓글이 여기에 동적으로 추가됩니다 -->
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- 모달창 (게시글 작성/수정) -->
+    <dialog id="postModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">게시글 작성</h2>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            <form id="postForm" class="modal-form">
+                <input type="hidden" id="postId" value="">
+                <div class="form-group">
+                    <label for="postTitle">제목</label>
+                    <input type="text" id="postTitle" required class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="postBody">내용</label>
+                    <textarea id="postBody" required class="form-textarea"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="postUserId">사용자 ID</label>
+                    <input type="number" id="postUserId" value="1" required class="form-input">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelBtn">취소</button>
+                    <button type="submit" class="btn-primary" id="submitPostBtn">작성</button>
+                </div>
+            </form>
+        </div>
+    </dialog>
+
+    <!-- 삭제 확인 모달 -->
+    <dialog id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>게시글 삭제</h2>
+            </div>
+            <p>정말 이 게시글을 삭제하시겠습니까?</p>
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" id="cancelDeleteBtn">취소</button>
+                <button type="button" class="btn-danger" id="confirmDeleteBtn">삭제</button>
+            </div>
+        </div>
+    </dialog>
+
+    <script src="board.js"></script>
+</body>
+</html>
