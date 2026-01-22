@@ -63,6 +63,21 @@
     <article class="youtube">
         <iframe  src="https://www.youtube.com/embed/r0Azo8e2PkE?si=reg5pWfigjqd_Hf3?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
     </article>
+    <article class="lottie-animation">
+        <div id="lottie-animation"></div>
+    </article>
 		</section>
+
+    <!-- Lottie 애니메이션 라이브러리 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+    <script>
+        var animation = lottie.loadAnimation({
+            container: document.getElementById('lottie-animation'), // 애니메이션을 넣을 위치
+            renderer: 'svg', // 렌더링 방식 ('svg', 'canvas', 'html' 중 선택)
+            loop: true, // 반복 재생 여부
+            autoplay: true, // 자동 재생 여부
+            path: 'anim.json' // Lottie 파일의 경로
+        });
+    </script>
 </body>
 </html>
