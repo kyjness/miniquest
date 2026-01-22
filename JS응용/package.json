@@ -1,0 +1,7 @@
+{
+  "name": "js-응용",
+  "version": "1.0.0",
+  "description": "JavaScript 모듈 예제",
+  "type": "module",
+  "main": "app.js"
+}
